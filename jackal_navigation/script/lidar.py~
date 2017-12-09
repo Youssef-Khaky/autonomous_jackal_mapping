@@ -43,21 +43,28 @@ class Lidar:
         self.LOI = LOI
 
 
+    def region(self):
+        min_dist = self.getMinDest()
+        if min_dist > self.side_distance_thresh_upper:
+            return "far"
+        elif min_dist < side_distance_thresh_lower:
+            return "close"
+        else:
+            return "in_bound"
 
-    def aheadLessThanThresh(self):
-        return self.dist_readings[360] <self.forward_distance_thresh
+
 
     def lookAtWall(self):
         return self.LOI > self.sideThreshUpper_Tilt
 
     def lookingAway(self):
-        return self.sideThreshLower_Tilt < self.sideThreshLower_Tilt
+        return self.LOI < self.sideThreshLower_Tilt
 
     def far_from_wall(self):
-        return self.dist_readings[self.getLOI()] > side_distance_thresh_upper
+        return self.dist_readings[self.getLOI()] > self.side_distance_thresh_upper
 
     def close_to_wall(self):
-        return self.dist_readings[self.getLOI()] < side_distance_thresh_lower
+        return self.dist_readings[self.getLOI()] < self.side_distance_thresh_lower
 
 
 

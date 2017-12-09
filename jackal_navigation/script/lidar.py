@@ -39,22 +39,35 @@ class Lidar:
         #maximize the region we dont care about, we car about the right side, so readings from 80 to 300 are important, we ignore the rest
         npa[300:] = 999.9
         npa[0:80] = 999.9
-        LOI = np.argmin(npa)
-        self.LOI = LOI
+        self.LOI = np.argmin(npa)
 
 
+    def check_region(self):
+        min_dist = self.getMinDest()
+        if min_dist > self.side_distance_thresh_upper:
+            return "far"
+        elif min_dist < side_distance_thresh_lower:
+            return "close"
+        else:
+            return "in_bound"
 
-    def aheadLessThanThresh(self):
-        return self.dist_readings[360] <self.forward_distance_thresh
+    def check_tilt(self):
+        LOI = self.getLOI()
+        if LOI > self.sideThreshUpper_Tilt:
+            return "con"
+        elif LOI < sideThreshLower_Tilt:
+            return "div"
+        else:
+            return "parallel"
 
     def lookAtWall(self):
         return self.LOI > self.sideThreshUpper_Tilt
 
     def lookingAway(self):
-        return self.sideThreshLower_Tilt < self.sideThreshLower_Tilt
+        return self.LOI < self.sideThreshLower_Tilt
 
     def far_from_wall(self):
-        return self.dist_readings[self.getLOI()] > side_distance_thresh_upper
+        return self.dist_readings[self.getLOI()] > self.side_distance_thresh_upper
 
     def close_to_wall(self):
         return self.dist_readings[self.getLOI()] < self.side_distance_thresh_lower

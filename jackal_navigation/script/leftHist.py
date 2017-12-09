@@ -38,6 +38,7 @@ def callback(data,args):
     plt.axhline(y=sensor.getMinDest())
     _ = plt.xlabel('number of raser hits')
     _ = plt.ylabel('distance')
+    plt.ylim( 0, 5 ) 
     plt.draw()
     plt.pause(0.0001)
     plt.cla()
@@ -56,45 +57,16 @@ def getLOI(arr):
     #print(npa)
     LOI = np.argmin(npa)
     return LOI
-
 def correction():
-#    LOI = getLOI(arr)
-    LOI = sensor.getLOI()
-    print("LOI is", LOI, "dist is", sensor.DistOfPoint(120),"front clearance is",sensor.DistOfPoint(360))
+    region = sensor.check_region()
+    tilt = sensor.check_tilt()
 
-    if sensor.aheadLessThanThresh():
-        print("LOI is", LOI, "dist is", sensor.DistOfPoint(120),"front clearance is",sensor.DistOfPoint(360),"rotate ccw")
-        Jackal.rotate_by(0.5)
-
-    elif sensor.lookAtWall() and sensor.close_to_wall():
-        print("LOI is", LOI, "dist is", sensor.DistOfPoint(120),"front clearance is",sensor.DistOfPoint(360),"rotate ccw")
-        Jackal.rotate_by(0.5)
-
-    elif LOI >= 140 and sensor.DistOfPoint(120)>1:
-        print("LOI is", LOI, "dist is", sensor.DistOfPoint(120),"front clearance is",sensor.DistOfPoint(360),"forward")
+    if (region == "in_bound") or (region == "far" and tilt == "con") or (region == "close" and tilt == "div"):
         Jackal.move_forward(0.5)
-
-    elif LOI <= 100 and sensor.DistOfPoint(120)>1:
-        print("LOI is", LOI, "dist is", sensor.DistOfPoint(120),"front clearance is",sensor.DistOfPoint(360),"rotate cw")
+    elif region == "close":
+        Jackal.rotate_by(0.5)
+    elif region == "far":
         Jackal.rotate_by(-0.5)
-
-
-    elif LOI <= 100 and sensor.DistOfPoint(120)<0.5:
-        print("LOI is", LOI, "dist is", sensor.DistOfPoint(120),"front clearance is",sensor.DistOfPoint(360),"rotate ccw")
-        Jackal.move_forward(0.5)
-
-    elif sensor.DistOfPoint(120)<0.5:
-        print("too close moving away")
-        Jackal.rotate_by(0.5)
-
-    elif sensor.DistOfPoint(120)>1:
-        print("too far moving close")
-        Jackal.rotate_by(-0.5)
-
-
-    else:
-        print("LOI is", LOI, "dist is", sensor.DistOfPoint(120),"front clearance is",sensor.DistOfPoint(360),"forward")
-        Jackal.move_forward(0.5)
 
 
 

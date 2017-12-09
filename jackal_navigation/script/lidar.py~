@@ -57,7 +57,7 @@ class Lidar:
         return self.dist_readings[self.getLOI()] > side_distance_thresh_upper
 
     def close_to_wall(self):
-        return self.dist_readings[self.getLOI()] < self.side_distance_thresh_lower
+        return self.dist_readings[self.getLOI()] < side_distance_thresh_lower
 
 
 

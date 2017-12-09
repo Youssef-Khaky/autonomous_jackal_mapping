@@ -7,32 +7,24 @@ import numpy as np
 
 
 class Lidar:
+    LOI = 0 #line of interest
+    dist_readings = np.zeros(720)
 
-    def __init__(self):
-        self.LOI = 0 #line of interest
-        self.dist_readings = np.zeros(720)
-
-        self.forward_distance_thresh = 1
+    forward_distance_thresh = 1
 
 
-        self.side_distance_thresh_upper = 1
-        self.side_distance_thresh_lower = 0.5
+    side_distance_thresh_upper = 1
+    side_distance_thresh_lower = 0.5
 
-        self.sideThreshUpper_Tilt = 140
-        self.sideThreshLower_Tilt = 100
+
+    sideThreshUpper_Tilt = 140
+    sideThreshLower_Tilt = 100
 
 
     def getLOI(self):
         return self.LOI
 
-    def getMinDest(self):
-        return self.DistOfPoint(self.getLOI())
-
-    def DistOfPoint(self,point):
-        return self.dist_readings[point]
-
-    def update(self,laserscan):
-        self.dist_readings = laserscan.ranges
+    def updateLOI(self,laserscan):
         arr = laserscan.ranges #gettings the readings
         npa = np.asarray(arr, dtype=np.float64) #npa
 
@@ -42,9 +34,7 @@ class Lidar:
         LOI = np.argmin(npa)
         self.LOI = LOI
 
-
-
-    def aheadLessThanThresh(self):
+    def aheadLessThan(self):
         return self.dist_readings[360] <self.forward_distance_thresh
 
     def lookAtWall(self):
@@ -54,10 +44,10 @@ class Lidar:
         return self.sideThreshLower_Tilt < self.sideThreshLower_Tilt
 
     def far_from_wall(self):
-        return self.dist_readings[self.getLOI()] > side_distance_thresh_upper
+        return self.dist_readings[getLOI(self)] > side_distance_thresh_upper
 
     def close_to_wall(self):
-        return self.dist_readings[self.getLOI()] < self.side_distance_thresh_lower
+        return self.dist_readings[getLOI(self)] < side_distance_thresh_lower
 
 
 

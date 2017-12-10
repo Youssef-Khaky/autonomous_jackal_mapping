@@ -46,7 +46,7 @@ class Lidar:
         min_dist = self.getMinDest()
         if min_dist > self.side_distance_thresh_upper:
             return "far"
-        elif min_dist < side_distance_thresh_lower:
+        elif min_dist < self.side_distance_thresh_lower:
             return "close"
         else:
             return "in_bound"
@@ -55,7 +55,7 @@ class Lidar:
         LOI = self.getLOI()
         if LOI > self.sideThreshUpper_Tilt:
             return "con"
-        elif LOI < sideThreshLower_Tilt:
+        elif LOI < self.sideThreshLower_Tilt:
             return "div"
         else:
             return "parallel"

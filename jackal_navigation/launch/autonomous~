@@ -1,0 +1,3 @@
+<launch>
+<node name="bar1" pkg="jackal_navigation" type="leftHist" args="$(find baz_pkg)/resources/map.pgm" />
+</launch>

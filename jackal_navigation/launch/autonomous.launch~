@@ -1,0 +1,4 @@
+<launch>
+  <node name="auto_nav" pkg="jackal_navigation" type="leftHist.py" />
+
+</launch>

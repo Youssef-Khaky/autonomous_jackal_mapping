@@ -8,13 +8,13 @@ from mover_class import MoveJackal
 import numpy as np
 from geometry_msgs.msg import Twist
 import copy
-import matplotlib.patches as mpatches
+
 from lidar import Lidar
 
 
 
 def callback(data,args):
-    la = data.ranges
+    
     pub = args
     sensor.update(data)
     simplified_output = [0]*len(data.ranges)
@@ -24,24 +24,16 @@ def callback(data,args):
 
     simplified_output[LOI] = data.ranges[sensor.getLOI()]
 
-#    new_data = copy.copy(data)
-#    new_data.ranges = simplified_output
     data.ranges = simplified_output
 
-#    pub.publish(new_data)
     pub.publish(data)
 
-
-#    correction(Jackal,data.ranges)
     correction()
-#    _ = plt.hist(la,bins=[0.1,1,2,3,4,5,6,7,8,9,10])
-    _ = plt.plot(la)
+    datapoints = data.ranges
+    _ = plt.plot(datapoints)
     plt.axhline(y=sensor.getMinDest())
-    plt.axvline(x=LOI)
     _ = plt.xlabel('number of raser hits')
-    _ = plt.ylabel(str(LOI))
-    plt.ylim( 0, 5 ) 
-    plt.xlim( 50, 350 ) 
+    _ = plt.ylabel('distance')
     plt.draw()
     plt.pause(0.0001)
     plt.cla()
@@ -60,17 +52,45 @@ def getLOI(arr):
     #print(npa)
     LOI = np.argmin(npa)
     return LOI
+
 def correction():
-    region = sensor.check_region()
-    tilt = sensor.check_tilt()
+#    LOI = getLOI(arr)
+    LOI = sensor.getLOI()
+    print("LOI is", LOI, "dist is", sensor.DistOfPoint(120),"front clearance is",sensor.DistOfPoint(360))
 
-    if (region == "in_bound" and tilt == "parallel") or (region == "far" and tilt == "con") or (region == "close" and tilt == "div"):
-        print(region, tilt,"move_forward")
-    elif (region == "close") or ( region == "in_bound" and tilt == "con"):
-        print(region, tilt,"rotate_by(0.5)")
-    elif region == "far" or ( region == "in_bound" and tilt == "div"):
-        print(region, tilt,"rotate_by(-0.5)")
+    if sensor.aheadLessThanThresh():
+        print("LOI is", LOI, "dist is", sensor.DistOfPoint(120),"front clearance is",sensor.DistOfPoint(360),"rotate ccw")
+        Jackal.rotate_by(0.5)
 
+    elif sensor.lookAtWall() and sensor.close_to_wall():
+        print("LOI is", LOI, "dist is", sensor.DistOfPoint(120),"front clearance is",sensor.DistOfPoint(360),"rotate ccw")
+        Jackal.rotate_by(0.5)
+
+    elif LOI >= 140 and sensor.DistOfPoint(120)>1:
+        print("LOI is", LOI, "dist is", sensor.DistOfPoint(120),"front clearance is",sensor.DistOfPoint(360),"forward")
+        Jackal.move_forward(0.5)
+
+    elif LOI <= 100 and sensor.DistOfPoint(120)>1:
+        print("LOI is", LOI, "dist is", sensor.DistOfPoint(120),"front clearance is",sensor.DistOfPoint(360),"rotate cw")
+        Jackal.rotate_by(-0.5)
+
+
+    elif LOI <= 100 and sensor.DistOfPoint(120)<0.5:
+        print("LOI is", LOI, "dist is", sensor.DistOfPoint(120),"front clearance is",sensor.DistOfPoint(360),"rotate ccw")
+        Jackal.move_forward(0.5)
+
+    elif sensor.DistOfPoint(120)<0.5:
+        print("too close moving away")
+        Jackal.rotate_by(0.5)
+
+    elif sensor.DistOfPoint(120)>1:
+        print("too far moving close")
+        Jackal.rotate_by(-0.5)
+
+
+    else:
+        print("LOI is", LOI, "dist is", sensor.DistOfPoint(120),"front clearance is",sensor.DistOfPoint(360),"forward")
+        Jackal.move_forward(0.5)
 
 
 
